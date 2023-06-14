@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><xmi:XMI xmlns:xmi="http://www.omg.org/spec/XMI/20131001" xmlns:QuantumUMLProfile="http://QuantumUMLProfile/schemas/QuantumUMLProfile/_zeqykL6NEe24U6R9ykQTQA/15" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:uml="http://www.eclipse.org/uml2/5.0.0/UML" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmi:version="20131001" xsi:schemaLocation="http://QuantumUMLProfile/schemas/QuantumUMLProfile/_zeqykL6NEe24U6R9ykQTQA/15 profile/QuantumUMLProfile.profile.uml#_zetO0L6NEe24U6R9ykQTQA">
+  <uml:Model name="prueba" xmi:id="_wdMKAARnEe61zbfMP8L2fg">
+    <packageImport xmi:id="_wdkkgARnEe61zbfMP8L2fg" xmi:type="uml:PackageImport">
+      <importedPackage href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#_0" xmi:type="uml:Model"/>
+    </packageImport>
+    <packagedElement group="_6A8YMARnEe61zbfMP8L2fg" name="mutation" node="_a9ZuAARvEe61zbfMP8L2fg _eKUV8ARvEe61zbfMP8L2fg _rtqmMARvEe61zbfMP8L2fg _3qDfsARvEe61zbfMP8L2fg" xmi:id="_wdS3sARnEe61zbfMP8L2fg" xmi:type="uml:Activity">
+      <edge source="_rtqmMARvEe61zbfMP8L2fg" target="_a9ZuAARvEe61zbfMP8L2fg" xmi:id="_tx35oARvEe61zbfMP8L2fg" xmi:type="uml:ControlFlow"/>
+      <edge inPartition="_6A8YMARnEe61zbfMP8L2fg" source="_a9ZuAARvEe61zbfMP8L2fg" target="_eKUV8ARvEe61zbfMP8L2fg" xmi:id="_wCzacARvEe61zbfMP8L2fg" xmi:type="uml:ControlFlow"/>
+      <edge source="_eKUV8ARvEe61zbfMP8L2fg" target="_3qDfsARvEe61zbfMP8L2fg" xmi:id="_ZeRBEARwEe61zbfMP8L2fg" xmi:type="uml:ControlFlow"/>
+      <group edge="_wCzacARvEe61zbfMP8L2fg" name="q0" node="_a9ZuAARvEe61zbfMP8L2fg _eKUV8ARvEe61zbfMP8L2fg" xmi:id="_6A8YMARnEe61zbfMP8L2fg" xmi:type="uml:ActivityPartition"/>
+      <node inPartition="_6A8YMARnEe61zbfMP8L2fg" incoming="_tx35oARvEe61zbfMP8L2fg" name="s" outgoing="_wCzacARvEe61zbfMP8L2fg" xmi:id="_a9ZuAARvEe61zbfMP8L2fg" xmi:type="uml:CallOperationAction"/>
+      <node inPartition="_6A8YMARnEe61zbfMP8L2fg" incoming="_wCzacARvEe61zbfMP8L2fg" name="Z" outgoing="_ZeRBEARwEe61zbfMP8L2fg" xmi:id="_eKUV8ARvEe61zbfMP8L2fg" xmi:type="uml:CallOperationAction"/>
+      <node name="" outgoing="_tx35oARvEe61zbfMP8L2fg" xmi:id="_rtqmMARvEe61zbfMP8L2fg" xmi:type="uml:InitialNode"/>
+      <node incoming="_ZeRBEARwEe61zbfMP8L2fg" name="ActivityFinalNode13" xmi:id="_3qDfsARvEe61zbfMP8L2fg" xmi:type="uml:ActivityFinalNode"/>
+    </packagedElement>
+    <profileApplication xmi:id="_y4XL8ARnEe61zbfMP8L2fg" xmi:type="uml:ProfileApplication">
+      <eAnnotations source="http://www.eclipse.org/uml2/2.0.0/UML" xmi:id="_y4XzAARnEe61zbfMP8L2fg" xmi:type="ecore:EAnnotation">
+        <references href="profile/QuantumUMLProfile.profile.uml#_zel6EL6NEe24U6R9ykQTQA" xmi:type="ecore:EPackage"/>
+      </eAnnotations>
+      <appliedProfile href="profile/QuantumUMLProfile.profile.uml#_TU1zcOP7EeubK-rnJ_MIxA" xmi:type="uml:Profile"/>
+    </profileApplication>
+    <profileApplication xmi:id="_y4YaEARnEe61zbfMP8L2fg" xmi:type="uml:ProfileApplication">
+      <eAnnotations source="http://www.eclipse.org/uml2/2.0.0/UML" xmi:id="_y4ZBIARnEe61zbfMP8L2fg" xmi:type="ecore:EAnnotation">
+        <references href="profile/QuantumUMLProfile.profile.uml#_zetO0L6NEe24U6R9ykQTQA" xmi:type="ecore:EPackage"/>
+      </eAnnotations>
+      <appliedProfile href="profile/QuantumUMLProfile.profile.uml#_UyBjIOP7EeubK-rnJ_MIxA" xmi:type="uml:Profile"/>
+    </profileApplication>
+  </uml:Model>
+  <QuantumUMLProfile:QuantumCircuit base_Activity="_wdS3sARnEe61zbfMP8L2fg" xmi:id="_3ZNg8ARnEe61zbfMP8L2fg"/>
+  <QuantumUMLProfile:Qubit base_ActivityPartition="_6A8YMARnEe61zbfMP8L2fg" xmi:id="_X5IrwARvEe61zbfMP8L2fg"/>
+  <QuantumUMLProfile:QuantumGate base_Action="_a9ZuAARvEe61zbfMP8L2fg" xmi:id="_caCEEARvEe61zbfMP8L2fg"/>
+  <QuantumUMLProfile:QuantumGate base_Action="_eKUV8ARvEe61zbfMP8L2fg" xmi:id="_eKbDoARvEe61zbfMP8L2fg"/>
+</xmi:XMI>

@@ -2,6 +2,7 @@ package qmmt.utils;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -34,6 +35,7 @@ import org.xml.sax.SAXException;
 public class DefaultParser {
 
 	private File file;
+	private int mutantCounter = 0;
 
 	public DefaultParser(File file) {
 		this.file = file;
@@ -127,6 +129,24 @@ public class DefaultParser {
 				}
 			}
 		}
+	}
+
+	public void saveFile(Document uml) {
+		TransformerFactory transformerFactory = TransformerFactory.newInstance();
+		Transformer transformer;
+		try {
+			transformer = transformerFactory.newTransformer();
+			FileWriter writer = new FileWriter(
+					new File("umlModels\\mutantsQG\\mutant" + mutantCounter + ".uml"));
+			++mutantCounter;
+			DOMSource source = new DOMSource(uml);
+			StreamResult result = new StreamResult(writer);
+			transformer.transform(source, result);
+
+		} catch ( IOException | TransformerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
 	}
 
 }

@@ -34,10 +34,11 @@ public class Main {
 		File f = new File(route);
 		dp = new DefaultParser(f);
 		Document uml = dp.buildDocument();
-		ArrayList<Document> umlQGR = qGateReplacement(uml);
+		qGateReplacement(uml);
+		
 	}
 
-	private static ArrayList<Document> qGateReplacement(Document uml) {
+	private static void qGateReplacement(Document uml) {
 		ArrayList<Node> qGates = getGatesNodes(uml);
 		ArrayList<Document> mutants = new ArrayList<>();
 
@@ -46,13 +47,13 @@ public class Main {
 			String qgName = attributes.getNamedItem("name").getTextContent();
 			for (QuantumGatesEnum qgs : QuantumGatesEnum.values()) {
 				if (qgName.toUpperCase().equals(qgs.getQuantumGate())) {
-					mutants = createMutantQGR(uml, qgs, n);
+					mutants.addAll(createMutantQGR(uml, qgs, n));
 				}
 			}
 		}
-
-		return null;
-
+		for (Document d : mutants){
+			dp.saveFile(d);
+		}
 	}
 
 	private static ArrayList<Document> createMutantQGR(Document umlComplete, QuantumGatesEnum quantumGateFound,
@@ -75,11 +76,6 @@ public class Main {
 				e.printStackTrace();
 			}
 		}
-			try {
-					printDocument(mutants.get(0), System.out);
-				} catch (IOException | TransformerException e) {
-					e.printStackTrace();
-				}
 		return mutants;
 	}
 
@@ -97,16 +93,17 @@ public class Main {
 		}
 		return qGatesNodes;
 	}
-public static void printDocument(Document doc, OutputStream out) throws IOException, TransformerException {
-    TransformerFactory tf = TransformerFactory.newInstance();
-    Transformer transformer = tf.newTransformer();
-    transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
-    transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-    transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-    transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-    transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
 
-    transformer.transform(new DOMSource(doc), 
-         new StreamResult(new OutputStreamWriter(out, "UTF-8")));
-}
+	public static void printDocument(Document doc, OutputStream out) throws IOException, TransformerException {
+		TransformerFactory tf = TransformerFactory.newInstance();
+		Transformer transformer = tf.newTransformer();
+		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+		transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+		transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+		transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+
+		transformer.transform(new DOMSource(doc),
+				new StreamResult(new OutputStreamWriter(out, "UTF-8")));
+	}
 }
