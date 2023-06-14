@@ -1,25 +1,36 @@
 package qmmt;
 
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import qmmt.model.QuantumGatesEnum;
 import qmmt.model.UmlEnum;
 import qmmt.utils.DefaultParser;
 
 import java.io.File;
-import java.lang.reflect.Array;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 public class Main {
 	static DefaultParser dp;
 
 	public static void main(String[] args) {
-
-		String route = "../QModellingMutationTesting/umlModels/prueba.uml";
+		String route = "umlModels\\prueba.uml";
 		File f = new File(route);
 		dp = new DefaultParser(f);
 		Document uml = dp.buildDocument();
@@ -35,8 +46,7 @@ public class Main {
 			String qgName = attributes.getNamedItem("name").getTextContent();
 			for (QuantumGatesEnum qgs : QuantumGatesEnum.values()) {
 				if (qgName.toUpperCase().equals(qgs.getQuantumGate())) {
-					mutants = createMutantQGR(uml, qgName, qgs, n);
-					System.out.println("Puerta cuantica encontrada: " + qgName + " es el enum " + qgs.name());
+					mutants = createMutantQGR(uml, qgs, n);
 				}
 			}
 		}
@@ -45,38 +55,32 @@ public class Main {
 
 	}
 
-	private static ArrayList<Document> createMutantQGR(Document uml, String qgName, QuantumGatesEnum qgs, Node umlNode) {
+	private static ArrayList<Document> createMutantQGR(Document umlComplete, QuantumGatesEnum quantumGateFound,
+			Node umlNode) {
 		ArrayList<Document> mutants = new ArrayList<>();
-		String idOriginalUml = 	umlNode.getAttributes().getNamedItem("xmi:id").getTextContent();
 
-		for(int i = 0; i<qgs.getEquivalences().length;i++){
-			Document mutant = dp.createCopy(uml);
-			Node n = umlNode.cloneNode(false);
-			n.getAttributes().getNamedItem("name").setNodeValue(qgs.getEquivalences()[i]);
-			Node mutantNode = seekNode(mutant, n.getAttributes().getNamedItem("xmi:id"));
-			// Node attributeNode = n.getAttributes().getNamedItem("name");
-			// attributeNode.setNodeValue(qgs.getEquivalences()[i]);
-			// mutant.replaceChild(attributeNode, umlNode);
-			// mutants.add(mutant);
+		NamedNodeMap umlNodeAttr = umlNode.getAttributes();
+		String idUmlNode = umlNodeAttr.getNamedItem("xmi:id").getTextContent();
+		System.out.println("Trabajando con el nodo: " + idUmlNode);
+
+		for (int i = 0; i < quantumGateFound.getEquivalences().length; i++) {
+			Document umlCompleteMutant;
+			try {
+				umlCompleteMutant = dp.createCopy(umlComplete);
+				dp.findNodeAndChange(umlCompleteMutant, idUmlNode, quantumGateFound.getEquivalences()[i]);
+				mutants.add(umlCompleteMutant);
+
+			} catch (ParserConfigurationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
-
-		return mutants;
-	}
-
-	private static Node seekNode(Document mutant, Node originalId) {
-		NodeList allNodes = mutant.getChildNodes();
-
-		for(int i = 0; i<allNodes.getLength();i++){
-			NamedNodeMap n = allNodes.item(i).getAttributes();
-
-
-
-				// if(n.equals(originalId)){
-
-				// }
+			try {
+					printDocument(mutants.get(0), System.out);
+				} catch (IOException | TransformerException e) {
+					e.printStackTrace();
 				}
-
-		return null;
+		return mutants;
 	}
 
 	private static ArrayList<Node> getGatesNodes(Document umlDocument) {
@@ -93,9 +97,16 @@ public class Main {
 		}
 		return qGatesNodes;
 	}
+public static void printDocument(Document doc, OutputStream out) throws IOException, TransformerException {
+    TransformerFactory tf = TransformerFactory.newInstance();
+    Transformer transformer = tf.newTransformer();
+    transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+    transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+    transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+    transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+    transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
 
-	private ArrayList<Document> mutSingleUnitary(Document uml) {
-
-		return null;
-	}
+    transformer.transform(new DOMSource(doc), 
+         new StreamResult(new OutputStreamWriter(out, "UTF-8")));
+}
 }
