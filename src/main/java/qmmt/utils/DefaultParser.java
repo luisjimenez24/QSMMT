@@ -32,6 +32,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import qmmt.Main;
+
 public class DefaultParser {
 
 	private File file;
@@ -112,7 +114,6 @@ public class DefaultParser {
 			NamedNodeMap attrGate = allGatesNode.item(i).getAttributes();
 			if (attrGate.getNamedItem("xmi:id").getTextContent().equals(idUmlNode)) {
 				Element value = (Element) allGatesNode.item(i);
-				System.out.println(qgToChange);
 				value.setAttribute("name", qgToChange);
 				TransformerFactory factory = TransformerFactory.newInstance();
 				try {
@@ -143,10 +144,17 @@ public class DefaultParser {
 			StreamResult result = new StreamResult(writer);
 			transformer.transform(source, result);
 
-		} catch ( IOException | TransformerException e) {
+		} catch (IOException | TransformerException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} 
+		}
 	}
+
+	public void deleteBaseAction(Document umlMutant, String qgId) {
+		String exQUMLProfQG = "//QuantumGate[@base_Action=\"" + qgId + "\"]";
+		NodeList qUmlProfileNode = evaluateExpresion(umlMutant, exQUMLProfQG);
+		Node child = qUmlProfileNode.item(0);
+		child.getParentNode().removeChild(child);
+	 }
 
 }

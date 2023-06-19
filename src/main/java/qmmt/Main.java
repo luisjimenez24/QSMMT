@@ -60,15 +60,36 @@ public class Main {
 	}
 
 	private static Document createMutantGGD(Document uml, Node qgNode) {
+		Document umlMutant = null;
+		try {
+			umlMutant = dp.createCopy(uml);
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		//Consigo el id del edge que apunta a la puerta cuántica actual
 		String qgId = qgNode.getAttributes().getNamedItem("xmi:id").getTextContent();
 		String evIncomingEdge ="//edge[@target=\""+qgId+"\"]";
-		NodeList edgeIncoming = dp.evaluateExpresion(uml, evIncomingEdge);
+		NodeList edgeIncoming = dp.evaluateExpresion(umlMutant, evIncomingEdge);
 
 		//Una vez conseguido el id del nodo previo, conseguimos su Node
 		String idPreviousNode = edgeIncoming.item(0).getAttributes().getNamedItem("source").getTextContent();
 		String evPreviousNode ="//node[@id=\""+idPreviousNode+"\"]";
-		NodeList previousNode = dp.evaluateExpresion(uml, evPreviousNode);
+		NodeList previousNode = dp.evaluateExpresion(umlMutant, evPreviousNode);
+
+		//Primer delete: el elemento de <QuantumUMLProfile:QuantumGate...
+		dp.deleteBaseAction(umlMutant, qgId); 
+
+		try {
+			printDocument(umlMutant, System.out);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TransformerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		/*Ahora se pueden dar 3 posibles casos: 
 			- 1º El nodo de la puerta cuántica sea el primero del UML -> El nodo previo es un Initial Node
