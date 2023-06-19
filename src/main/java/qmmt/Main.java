@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
@@ -34,27 +35,59 @@ public class Main {
 		File f = new File(route);
 		dp = new DefaultParser(f);
 		Document uml = dp.buildDocument();
-		qGateReplacement(uml);
-		
+		createMutants(uml);
 	}
 
-	private static void qGateReplacement(Document uml) {
-		ArrayList<Node> qGates = getGatesNodes(uml);
-		ArrayList<Document> mutants = new ArrayList<>();
 
+	private static void createMutants(Document uml) {
+		ArrayList<Node> qGates = getGatesNodes(uml);
+		ArrayList<Document> mutantsQGR = new ArrayList<>();
+		ArrayList<Document> mutantsQGD = new ArrayList<>();
+		
 		for (Node n : qGates) {
 			NamedNodeMap attributes = n.getAttributes();
 			String qgName = attributes.getNamedItem("name").getTextContent();
 			for (QuantumGatesEnum qgs : QuantumGatesEnum.values()) {
 				if (qgName.toUpperCase().equals(qgs.getQuantumGate())) {
-					mutants.addAll(createMutantQGR(uml, qgs, n));
+					//mutantsQGR.addAll(createMutantQGR(uml, qgs, n));
+					mutantsQGD.add(createMutantGGD(uml, n));
 				}
 			}
 		}
-		for (Document d : mutants){
+		for (Document d : mutantsQGR){
 			dp.saveFile(d);
 		}
 	}
+
+	private static Document createMutantGGD(Document uml, Node qgNode) {
+		//Consigo el id del edge que apunta a la puerta cuántica actual
+		String qgId = qgNode.getAttributes().getNamedItem("xmi:id").getTextContent();
+		String evIncomingEdge ="//edge[@target=\""+qgId+"\"]";
+		NodeList edgeIncoming = dp.evaluateExpresion(uml, evIncomingEdge);
+
+		//Una vez conseguido el id del nodo previo, conseguimos su Node
+		String idPreviousNode = edgeIncoming.item(0).getAttributes().getNamedItem("source").getTextContent();
+		String evPreviousNode ="//node[@id=\""+idPreviousNode+"\"]";
+		NodeList previousNode = dp.evaluateExpresion(uml, evPreviousNode);
+
+		/*Ahora se pueden dar 3 posibles casos: 
+			- 1º El nodo de la puerta cuántica sea el primero del UML -> El nodo previo es un Initial Node
+			- 2º El nodo de la puerta cuántica es el último del UML -> El nodo posterior es un Final Node
+			- 3º El nodo de la puerta cuántica es intermedio -> 💀
+
+		Evaluamos si nos encontramos en el primer o tercer caso
+		*/
+
+		String previousNodeType = previousNode.item(0).getAttributes().getNamedItem("xmi:type").getTextContent();
+
+		if(previousNodeType.equals("uml:InitialNode")){
+			System.out.println("La puerta "+qgId+" tiene antes un Initial Node");
+		}else {
+			
+		}
+		return null;
+	}
+
 
 	private static ArrayList<Document> createMutantQGR(Document umlComplete, QuantumGatesEnum quantumGateFound,
 			Node umlNode) {
