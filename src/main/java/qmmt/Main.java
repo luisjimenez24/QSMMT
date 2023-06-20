@@ -78,6 +78,9 @@ public class Main {
 		// de la puerta cuántica a borrar
 		deleteQubitNodeAttr(umlMutant, qgId);
 
+		// Cuarto delete: el nodo de la puerta cuántica
+		deleteQuantumGateNode(umlMutant, qgId);
+
 		try {
 		dp.printDocument(umlMutant, System.out);
 		} catch (IOException e) {
@@ -118,6 +121,7 @@ public class Main {
 		String idPreviousNode = edgeIncoming.item(0).getAttributes().getNamedItem("source").getTextContent();
 		String evPreviousNode = "//node[@id=\"" + idPreviousNode + "\"]";
 		NodeList previousNode = dp.evaluateExpresion(umlMutant, evPreviousNode);
+
 		return previousNode;
 	}
 
@@ -130,6 +134,7 @@ public class Main {
 		String idNextNode = nextEdgeNode.item(0).getAttributes().getNamedItem("target").getTextContent();
 		String evNextNode = "//node[@id=\"" + idNextNode + "\"]";
 		NodeList nextNode = dp.evaluateExpresion(umlMutant, evNextNode);
+
 		return nextNode;
 	}
 
@@ -203,7 +208,6 @@ public class Main {
 
 	private static void deleteQubitNodeAttr(Document umlMutant, String qgId) {
 		NodeList qubits = dp.evaluateExpresion(umlMutant, "//group");
-		System.out.println(qubits.getLength());
 
 		for (int i = 0; i < qubits.getLength(); i++) {
 			Node qubit = qubits.item(i);
@@ -221,18 +225,19 @@ public class Main {
 				i = qubits.getLength();
 			}
 		}
+	}
 
-		// Node packagedElem = packagedElemNodeList.item(0);
-		// Node attrPackagedElm = packagedElem.getAttributes().getNamedItem("node");
-
-		// String[] attr = attrPackagedElm.getTextContent().split(" ");
-		// String setNodeAttr = "";
-		// for (String s : attr) {
-		// if (!s.equals(qgId)) {
-		// setNodeAttr += s + " ";
-		// }
-		// }
-		// attrPackagedElm.setNodeValue(setNodeAttr);
+	private static void deleteQuantumGateNode(Document umlMutant, String qgId) {
+		NodeList quantumGates = dp.evaluateExpresion(umlMutant, "//node");
+		Node qgToDelete = null;
+		for (int i = 0 ; i<quantumGates.getLength(); i++){
+			Node quantumGate = quantumGates.item(i);
+			Node qubitNodeAttr = quantumGate.getAttributes().getNamedItem("xmi:id");
+				if (qubitNodeAttr.getTextContent().equals(qgId)){
+					qgToDelete = quantumGates.item(i);
+				}
+			}
+		qgToDelete.getParentNode().removeChild(qgToDelete);
 	}
 
 }
