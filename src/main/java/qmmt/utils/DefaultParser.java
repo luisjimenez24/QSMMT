@@ -151,10 +151,27 @@ public class DefaultParser {
 	}
 
 	public void deleteBaseAction(Document umlMutant, String qgId) {
-		String exQUMLProfQG = "//QuantumGate[@base_Action=\"" + qgId + "\"]";
-		NodeList qUmlProfileNode = evaluateExpresion(umlMutant, exQUMLProfQG);
-		Node child = qUmlProfileNode.item(0);
-		child.getParentNode().removeChild(child);
-	 }
+		// String exQUMLProfQG = "//*/@*[.='" + qgId + "']";
+		String exQUMLProfQG = "//QuantumGate";
+		Element root = umlMutant.getDocumentElement();
+		Node deleteNode = null;
+		for (int i = 0; i < root.getChildNodes().getLength(); i++) {
+			if (root.getChildNodes().item(i).getNodeName().equals("QuantumUMLProfile:QuantumGate")) {
+				NamedNodeMap att = root.getChildNodes().item(i).getAttributes();
+				if (att.getNamedItem("base_Action").getTextContent().equals(qgId)) {
+					deleteNode = root.getChildNodes().item(i);
+				}
+			}
+		}
+
+		deleteNode.getParentNode().removeChild(deleteNode);
+
+		try {
+			Main.printDocument(umlMutant, System.out);
+		} catch (IOException | TransformerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 }
