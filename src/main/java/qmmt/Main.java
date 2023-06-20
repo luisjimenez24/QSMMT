@@ -14,18 +14,11 @@ import qmmt.utils.DefaultParser;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.Collection;
 
+import java.util.ArrayList;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
+
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 public class Main {
 	static DefaultParser dp;
@@ -81,15 +74,20 @@ public class Main {
 		// puerta cuántica a borrar
 		deletePackagedElementNodeAttribute(umlMutant, qgId);
 
+		// Tercer delete: en el atributo "node" del qubit donde se aplica aparece el ID
+		// de la puerta cuántica a borrar
+		deleteQubitNodeAttr(umlMutant, qgId);
+
 		try {
-			dp.printDocument(umlMutant, System.out);
+		dp.printDocument(umlMutant, System.out);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		// TODO Auto-generated catch block
+		e.printStackTrace();
 		} catch (TransformerException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		// TODO Auto-generated catch block
+		e.printStackTrace();
 		}
+
 		/*
 		 * Ahora se pueden dar 3 posibles casos:
 		 * - 1º El nodo de la puerta cuántica sea el primero del UML -> El nodo previo
@@ -187,19 +185,54 @@ public class Main {
 
 		deleteNode.getParentNode().removeChild(deleteNode);
 	}
+
 	private static void deletePackagedElementNodeAttribute(Document umlMutant, String qgId) {
 		NodeList packagedElemNodeList = dp.evaluateExpresion(umlMutant, "//packagedElement");
 		Node packagedElem = packagedElemNodeList.item(0);
 		Node attrPackagedElm = packagedElem.getAttributes().getNamedItem("node");
 
-		String [] attr = attrPackagedElm.getTextContent().split(" ");
+		String[] attr = attrPackagedElm.getTextContent().split(" ");
 		String setNodeAttr = "";
-		for(String s : attr){
-			if(!s.equals(qgId)){
-				setNodeAttr+=s+" ";
+		for (String s : attr) {
+			if (!s.equals(qgId)) {
+				setNodeAttr += s + " ";
 			}
 		}
-	attrPackagedElm.setNodeValue(setNodeAttr);
+		attrPackagedElm.setNodeValue(setNodeAttr);
+	}
+
+	private static void deleteQubitNodeAttr(Document umlMutant, String qgId) {
+		NodeList qubits = dp.evaluateExpresion(umlMutant, "//group");
+		System.out.println(qubits.getLength());
+
+		for (int i = 0; i < qubits.getLength(); i++) {
+			Node qubit = qubits.item(i);
+			Node qubitNodeAttr = qubit.getAttributes().getNamedItem("node");
+
+			if (qubitNodeAttr.getTextContent().contains(qgId)) {
+				String[] attr = qubitNodeAttr.getTextContent().split(" ");
+				String setNodeAttr = "";
+				for (String s : attr) {
+					if (!s.equals(qgId)) {
+						setNodeAttr += s + " ";
+					}
+				}
+				qubitNodeAttr.setNodeValue(setNodeAttr);
+				i = qubits.getLength();
+			}
+		}
+
+		// Node packagedElem = packagedElemNodeList.item(0);
+		// Node attrPackagedElm = packagedElem.getAttributes().getNamedItem("node");
+
+		// String[] attr = attrPackagedElm.getTextContent().split(" ");
+		// String setNodeAttr = "";
+		// for (String s : attr) {
+		// if (!s.equals(qgId)) {
+		// setNodeAttr += s + " ";
+		// }
+		// }
+		// attrPackagedElm.setNodeValue(setNodeAttr);
 	}
 
 }
