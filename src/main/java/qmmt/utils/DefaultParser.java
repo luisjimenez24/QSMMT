@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -29,10 +31,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-
-import qmmt.Main;
 
 public class DefaultParser {
 
@@ -47,6 +46,7 @@ public class DefaultParser {
 		return this.file;
 	}
 
+	//Método para hacer parsear de File a Document (w3c.doc)
 	public Document buildDocument() {
 		FileInputStream fileIS;
 		try {
@@ -61,6 +61,7 @@ public class DefaultParser {
 		}
 	}
 
+	//método genérico para evaluar el UML document con sentencias XPath
 	public NodeList evaluateExpresion(Document umlDocument, String expression) {
 		NodeList nodeList = null;
 		XPath xPath = XPathFactory.newInstance().newXPath();
@@ -73,30 +74,7 @@ public class DefaultParser {
 		}
 	}
 
-	// public String changeStringXpath(String input, String attribute, String
-	// changeString)
-	// throws SAXException, IOException, ParserConfigurationException {
-	// System.out.println(input);
-	// InputSource source = new InputSource(new StringReader(input));
-
-	// DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-	// DocumentBuilder builder = builderFactory.newDocumentBuilder();
-	// Document document = builder.parse(source);
-
-	// XPathFactory xpathFactory = XPathFactory.newInstance();
-	// XPath xpath = xpathFactory.newXPath();
-
-	// String msg;
-	// try {
-	// msg = xpath.evaluate("/resp/msg", document);
-	// } catch (XPathExpressionException e) {
-	// // TODO Auto-generated catch block
-	// e.printStackTrace();
-	// }
-	//
-	// return null;
-	// }
-
+	//Método que sirve para copiar el documento UML y no modificar el original
 	public Document createCopy(Document originalDocument) throws ParserConfigurationException {
 		Node originalRoot = originalDocument.getDocumentElement();
 		DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
@@ -108,6 +86,7 @@ public class DefaultParser {
 		return copiedDocument;
 	}
 
+	//Método para encontrar el nodo de la puerta cuántica y reemplazar la puerta cuántica por otra equivalente
 	public void findNodeAndChange(Document umlCompleteMutant, String idUmlNode, String qgToChange) {
 		NodeList allGatesNode = evaluateExpresion(umlCompleteMutant, "//node");
 		for (int i = 0; i < allGatesNode.getLength(); i++) {
@@ -132,6 +111,7 @@ public class DefaultParser {
 		}
 	}
 
+	//Método para guardar de manera persistente un Document UML
 	public void saveFile(Document uml) {
 		TransformerFactory transformerFactory = TransformerFactory.newInstance();
 		Transformer transformer;
@@ -150,28 +130,17 @@ public class DefaultParser {
 		}
 	}
 
-	public void deleteBaseAction(Document umlMutant, String qgId) {
-		// String exQUMLProfQG = "//*/@*[.='" + qgId + "']";
-		String exQUMLProfQG = "//QuantumGate";
-		Element root = umlMutant.getDocumentElement();
-		Node deleteNode = null;
-		for (int i = 0; i < root.getChildNodes().getLength(); i++) {
-			if (root.getChildNodes().item(i).getNodeName().equals("QuantumUMLProfile:QuantumGate")) {
-				NamedNodeMap att = root.getChildNodes().item(i).getAttributes();
-				if (att.getNamedItem("base_Action").getTextContent().equals(qgId)) {
-					deleteNode = root.getChildNodes().item(i);
-				}
-			}
-		}
+	//Método para imprimir por la terminal un Document
+	public static void printDocument(Document doc, OutputStream out) throws IOException, TransformerException {
+		TransformerFactory tf = TransformerFactory.newInstance();
+		Transformer transformer = tf.newTransformer();
+		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+		transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+		transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+		transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
 
-		deleteNode.getParentNode().removeChild(deleteNode);
-
-		try {
-			Main.printDocument(umlMutant, System.out);
-		} catch (IOException | TransformerException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		transformer.transform(new DOMSource(doc),
+				new StreamResult(new OutputStreamWriter(out, "UTF-8")));
 	}
-
 }
