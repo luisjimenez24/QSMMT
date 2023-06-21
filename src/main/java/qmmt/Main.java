@@ -86,21 +86,25 @@ public class Main {
 		// Cuarto delete: el nodo de la puerta cuántica
 		deleteQuantumGateNode(umlMutant, qgId);
 
-		// Quinto delete: el edge que apunta de la puerta cuántica que estamos borrando con la siguiente
+		// Quinto delete: el edge que apunta de la puerta cuántica que estamos borrando
+		// con la siguiente
 		deleteNextEdge(umlMutant, qgId);
 
 		// Modificación del previous edge
 		String idNextQg = previousNode.item(0).getAttributes().getNamedItem("xmi:id").getTextContent();
-		modifyPreviousEdge(umlMutant, qgId, idNextQg);
+		String idModifiedEdge = modifyPreviousEdge(umlMutant, qgId, idNextQg);
+
+		// Modificación del atributo "incoming" de la siguiente puerta
+		modifyNextQuantumGateNode(umlMutant, idNextQg, idModifiedEdge);
 
 		// try {
-		// 	dp.printDocument(umlMutant, System.out);
+		// dp.printDocument(umlMutant, System.out);
 		// } catch (IOException e) {
-		// 	// TODO Auto-generated catch block
-		// 	e.printStackTrace();
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
 		// } catch (TransformerException e) {
-		// 	// TODO Auto-generated catch block
-		// 	e.printStackTrace();
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
 		// }
 
 		/*
@@ -124,21 +128,37 @@ public class Main {
 		return umlMutant;
 	}
 
+	// Las puertas cuánticas tienen el atributo "incoming" que apuntan el edge
+	// previo. Hay que cambiarlo por el nuevo edge que va a apuntar a la QG
+	private static void modifyNextQuantumGateNode(Document umlMutant, String idNextQg, String idModifiedEdge) {
+		String evModifiedEdge = "//edge[@id=\"" + idModifiedEdge + "\"]";
+		NodeList modifiedEdgeList = dp.evaluateExpresion(umlMutant, evModifiedEdge);
+		Node modifiedEdgNode = modifiedEdgeList.item(0);
 
-	//Con este método se pretende modificar el atributo "target" del edge que apunta a la QG borrada por el id del siguiente nodo
-	private static void modifyPreviousEdge(Document umlMutant, String qgId, String idNextQg) {
-		//Conseguimos el Node del edge previo
-		System.out.println("idNextQg: " +idNextQg);
+		String evNextQuantumGate = "//node[@id=\"" + idNextQg + "\"]";
+		NodeList nextQGNodelist = dp.evaluateExpresion(umlMutant, evNextQuantumGate);
+
+		Node quantumGate = nextQGNodelist.item(0);
+		quantumGate.getAttributes().getNamedItem("incoming").setNodeValue(modifiedEdgNode.getAttributes().getNamedItem("xmi:id").getTextContent());
+
+	//	nextQuantumGate.getAttributes().getNamedItem("incoming").setNodeValue(idModifiedEdge);
+	}
+
+	// Con este método se pretende modificar el atributo "target" del edge que
+	// apunta a la QG borrada por el id del siguiente nodo
+	private static String modifyPreviousEdge(Document umlMutant, String qgId, String idNextQg) {
+		// Conseguimos el Node del edge previo
 		String evIncomingEdge = "//edge[@target=\"" + qgId + "\"]";
 		NodeList edgeIncoming = dp.evaluateExpresion(umlMutant, evIncomingEdge);
 
-		//Modificamos el atributo "target"
+		// Modificamos el atributo "target"
 		Node incomingEdg = edgeIncoming.item(0);
 		incomingEdg.getAttributes().getNamedItem("target").setNodeValue(idNextQg);
 
+		return incomingEdg.getAttributes().getNamedItem("xmi:id").getTextContent();
 	}
 
-	//Borramos el ControlFlow que apunta a la siguiente puerta cuántica
+	// Borramos el ControlFlow que apunta a la siguiente puerta cuántica
 	private static void deleteNextEdge(Document umlMutant, String qgId) {
 		String evEdgeNextNode = "//edge[@source=\"" + qgId + "\"]";
 		NodeList nextEdgeNode = dp.evaluateExpresion(umlMutant, evEdgeNextNode);
@@ -178,7 +198,6 @@ public class Main {
 
 		NamedNodeMap umlNodeAttr = umlNode.getAttributes();
 		String idUmlNode = umlNodeAttr.getNamedItem("xmi:id").getTextContent();
-		System.out.println("Trabajando con el nodo: " + idUmlNode);
 
 		for (int i = 0; i < quantumGateFound.getEquivalences().length; i++) {
 			Document umlCompleteMutant;
