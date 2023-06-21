@@ -112,13 +112,13 @@ public class DefaultParser {
 	}
 
 	//Método para guardar de manera persistente un Document UML
-	public void saveFile(Document uml) {
+	public void saveFile(Document uml, String pathToSave) {
 		TransformerFactory transformerFactory = TransformerFactory.newInstance();
 		Transformer transformer;
 		try {
 			transformer = transformerFactory.newTransformer();
 			FileWriter writer = new FileWriter(
-					new File("umlModels\\mutantsQG\\mutant" + mutantCounter + ".uml"));
+					new File(pathToSave));
 			++mutantCounter;
 			DOMSource source = new DOMSource(uml);
 			StreamResult result = new StreamResult(writer);
