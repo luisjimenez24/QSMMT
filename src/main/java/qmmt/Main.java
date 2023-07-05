@@ -36,32 +36,65 @@ public class Main {
 		ArrayList<Document> mutantsQGR = new ArrayList<>();
 		ArrayList<Document> mutantsQGD = new ArrayList<>();
 		ArrayList<Document> mutantsQGI = new ArrayList<>();
+		ArrayList<Document> mutantsQMI = new ArrayList<>();
+		ArrayList<Document> mutantsQMD = new ArrayList<>();
 
 		// Se itera sobre el número de puertas cuánticas del diagrama
 		for (Node n : qGates) {
 			NamedNodeMap attributes = n.getAttributes();
 			String qgName = attributes.getNamedItem("name").getTextContent();
+			if(qgName.toUpperCase().equals("M")){
+					mutantsQMD.add(createMutantQGD(uml, n));
+				}
 			for (QuantumGatesEnum qgs : QuantumGatesEnum.values()) {
 				if (qgName.toUpperCase().equals(qgs.getQuantumGate())) {
 					// mutantsQGR.addAll(createMutantQGR(uml, qgs, n));
-					// mutantsQGD.add(createMutantGGD(uml, n));
-					mutantsQGI.addAll(createMutantQGI(uml, qgs, n));
+					// mutantsQGD.add(createMutantQGD(uml, n));
+					// mutantsQGI.addAll(createMutantQGI(uml, qgs, n));
+					// mutantsQMI.add(mutantcreateMutantQMI(uml, n));
 				}
 			}
 		}
-		// for (int i = 0; i < mutantsQGR.size(); i++) {
-		// String pathToSave = "umlModels\\mutantsQGR\\mutantQGR" + i + ".uml";
-		// dp.saveFile(mutantsQGR.get(i), pathToSave);
-		// }
-		// for (int i = 0; i < mutantsQGD.size(); i++) {
-		// String pathToSave = "umlModels\\mutantsQGD\\mutantQGD" + i + ".uml";
-		// dp.saveFile(mutantsQGD.get(i), pathToSave);
-		// }
+		saveMutants(mutantsQGR, "umlModels\\mutantsQGR\\mutantQGR");
+		saveMutants(mutantsQGD, "umlModels\\mutantsQGD\\mutantQGD");
+		saveMutants(mutantsQGI, "umlModels\\mutantsQGI\\mutantQGI");
+		saveMutants(mutantsQMI, "umlModels\\mutantsQMI\\mutantsQMI");
+		saveMutants(mutantsQMD, "umlModels\\mutantsQMD\\mutantsQMD");
+	}
 
-		for (int i = 0; i < mutantsQGI.size(); i++) {
-			String pathToSave = "umlModels\\mutantsQGI\\mutantQGI" + i + ".uml";
-			dp.saveFile(mutantsQGI.get(i), pathToSave);
+	private static Document createMutantQMD(Document uml, Node n) {
+		return null;
+	}
+
+	private static void saveMutants(ArrayList<Document> mutants, String pathToSave){
+		for (int i = 0; i < mutants.size(); i++) {
+			String path = pathToSave + i + ".uml";
+			dp.saveFile(mutants.get(i), path);
 		}
+	}
+
+	private static Document mutantcreateMutantQMI(Document uml, Node umlNode) {
+		Document umlMutant = null;
+			try {
+				umlMutant = dp.createCopy(uml);
+
+				// Cambiamos la siguiente puerta y obtenemos su ID
+				String idNextQg = changeNextQgQGI(umlMutant, umlNode);
+
+				// Cambiamos edge previo
+				String idPrevEdge = changePreviousEdgeQGI(umlMutant, umlNode);
+
+				// Insertamos el nuevo edge
+				insertNewEdgeQGI(umlMutant, idNextQg);
+
+				// Insertamos la nueva QG
+				insertNewQG(umlMutant, idPrevEdge, "M", "uml:CallOperationAction");
+
+			} catch (ParserConfigurationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		return umlMutant;
 	}
 
 	// Método para crear los mutantes con el método de Quantum Gate Insertion
@@ -86,7 +119,7 @@ public class Main {
 				insertNewEdgeQGI(umlMutant, idNextQg);
 
 				// Insertamos la nueva QG
-				insertNewQGQGI(umlMutant, idPrevEdge, quantumGateFound.getEquivalences()[i]);
+				insertNewQG(umlMutant, idPrevEdge, quantumGateFound.getEquivalences()[i], "uml:CallOperationAction");
 
 				mutants.add(umlMutant);
 
@@ -95,18 +128,12 @@ public class Main {
 				e.printStackTrace();
 			}
 		}
-		// try {
-		// dp.printDocument(mutants.get(1), System.out);
-		// } catch (IOException | TransformerException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
 
 		return mutants;
 	}
 
 	// Creamos el nod que va a introducirse
-	private static void insertNewQGQGI(Document umlMutant, String idPrevEdge, String quantumGateEq) {
+	private static void insertNewQG(Document umlMutant, String idPrevEdge, String quantumGateEq, String umlAction) {
 		// Conseguimos el anterior edge para asi conseguir el nodo de la anterior
 		// puerta.
 		System.out.println("ID PREV: " + idPrevEdge);
@@ -126,7 +153,7 @@ public class Main {
 		newEdge.setAttribute("incoming", idPrevEdge);
 		newEdge.setAttribute("xmi:id", "idMutant");
 		newEdge.setAttribute("name", quantumGateEq);
-		newEdge.setAttribute("xmi:type", "uml:CallOperationAction");
+		newEdge.setAttribute("xmi:type", umlAction);
 
 		// Creamos el elemento <QuantumUMLProfile:QuantumGate> para indicar que se crea una nueva puerta cuántica con el QUML Profile
 		Element qUmlProfilElement = umlMutant.createElement("QuantumUMLProfile:QuantumGate");
@@ -184,7 +211,7 @@ public class Main {
 	}
 
 	// Metodo para hacer los mutantes mediante Quantum Gate Deletion
-	private static Document createMutantGGD(Document uml, Node qgNode) {
+	private static Document createMutantQGD(Document uml, Node qgNode) {
 		Document umlMutant = null;
 		try {
 			umlMutant = dp.createCopy(uml);
