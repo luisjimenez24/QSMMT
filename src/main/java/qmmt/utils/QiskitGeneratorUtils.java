@@ -8,7 +8,7 @@ import org.eclipse.epsilon.emc.uml.UmlModel;
 import org.eclipse.epsilon.eol.exceptions.models.EolModelLoadingException;
 
 public class QiskitGeneratorUtils{
-    private static String umlProfileFilePath = "umlDiagrams/profiles/QuantumUMLProfile.profile.uml"; // Path to uml profile file
+    private static String umlProfileFilePath = "umlModels\\profiles\\QuantumUMLProfile.profile.uml"; // Path to uml profile file
 
     	public static UmlModel loadUml(String umlFilePath) {
 		UmlModel umlModel = new UmlModel();

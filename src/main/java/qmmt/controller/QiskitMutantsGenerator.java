@@ -1,9 +1,5 @@
 package qmmt.controller;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.epsilon.egl.EgxModule;
 import org.eclipse.epsilon.emc.uml.UmlModel;
 import org.eclipse.epsilon.eol.exceptions.EolRuntimeException;
@@ -12,7 +8,7 @@ import org.eclipse.epsilon.eol.exceptions.models.EolModelElementTypeNotFoundExce
 import qmmt.utils.QiskitGeneratorUtils;
 
 public class QiskitMutantsGenerator {
-	private static String egxActivityFilePath = "EGLtemplates/activityGen.egx"; // Path to egx activity file
+	private static String egxActivityFilePath = "src\\main\\java\\qmmt\\templates\\activityGen.egx"; // Path to egx activity file
 
     /**
      * Method that executes an egx file on uml activity file.

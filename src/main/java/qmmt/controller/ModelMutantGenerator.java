@@ -128,12 +128,10 @@ public class ModelMutantGenerator {
 	private static void insertNewQG(Document umlMutant, String idPrevEdge, String quantumGateEq, String umlAction) {
 		// Conseguimos el anterior edge para asi conseguir el nodo de la anterior
 		// puerta.
-		System.out.println("ID PREV: " + idPrevEdge);
 		String evGetPrevEdge = "//edge[@id=\"" + idPrevEdge + "\"]";
 		NodeList previousEdgeNodeList = dp.evaluateExpresion(umlMutant, evGetPrevEdge);
 
 		String idNextQg = previousEdgeNodeList.item(0).getAttributes().getNamedItem("xmi:id").getTextContent();
-		System.out.println(idNextQg);
 		String evGetPreviousQG = "//node[@outgoing=\"" + idNextQg + "\"]";
 		NodeList previousQg = dp.evaluateExpresion(umlMutant, evGetPreviousQG);
 
