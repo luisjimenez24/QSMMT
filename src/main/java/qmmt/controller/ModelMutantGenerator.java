@@ -54,15 +54,24 @@ public class ModelMutantGenerator {
 		saveMutants(mutantsQGR, "umlModels\\mutantsQGR\\mutantQGR");
 		saveMutants(mutantsQGD, "umlModels\\mutantsQGD\\mutantQGD");
 		saveMutants(mutantsQGI, "umlModels\\mutantsQGI\\mutantQGI");
-		saveMutants(mutantsQMI, "umlModels\\mutantsQMI\\mutantsQMI");
-		saveMutants(mutantsQMD, "umlModels\\mutantsQMD\\mutantsQMD");
+		saveMutants(mutantsQMI, "umlModels\\mutantsQMI\\mutantQMI");
+		saveMutants(mutantsQMD, "umlModels\\mutantsQMD\\mutantQMD");
 	}
 
 	private static void saveMutants(ArrayList<Document> mutants, String pathToSave){
 		for (int i = 0; i < mutants.size(); i++) {
+			changeNamePackagedElement(mutants.get(i), pathToSave.substring(pathToSave.length()-9) + i );
 			String path = pathToSave + i + ".uml";
 			dp.saveFile(mutants.get(i), path);
 		}
+	}
+
+	//Método para cambiar el Activity Model para generar varios Qiskit Programs
+	private static void changeNamePackagedElement(Document document, String newName) {
+		String evPackagedElementName = "//packagedElement";
+		NodeList packagedNodeList = dp.evaluateExpresion(document, evPackagedElementName);
+		Node packagedElement = packagedNodeList.item(0);
+		packagedElement.getAttributes().getNamedItem("name").setNodeValue(newName);
 	}
 
 	private static Document mutantcreateMutantQMI(Document uml, Node umlNode) {

@@ -19,6 +19,7 @@ public class Main {
 		menu();
 	}
 
+	//First menu of the application: 1) to generate UML mutants; 2) to generate Qiskit programs from UML models
 	private static void menu() {
 		System.out.println("---Quantum Software Model Mutant Generator---");
 		boolean opt = true;
@@ -28,18 +29,21 @@ public class Main {
 			switch (aux) {
 				case 1:
 					ModelMutantGenerator.initializeModelMutantGenerator(routeInputModel);
+					System.out.println("UML Mutants generated");
 					break;
 				case 2:
 					ArrayList<String> modelsToQiskit = new ArrayList<>();
 					mutantsToGenerate(modelsToQiskit);
 					executeQiskitGenerator(modelsToQiskit);
+					System.out.println("Qiskit programs generated");
 					break;
 			}
-			reader.close();
-		}
 
+		}
+		reader.close();
 	}
 
+	//Execute the Qiskit program generation to all the models from one folder
 	private static void executeQiskitGenerator(ArrayList<String> modelsToQiskit) {
 		for (String route : modelsToQiskit) {
 			final File folder = new File(route);
@@ -53,6 +57,7 @@ public class Main {
 		}
 	}
 
+	//Menu to choose the UML mutation approach (https://dl.acm.org/doi/pdf/10.1145/3533767.3543296)
 	private static void mutantsToGenerate(ArrayList<String> approachesToGenerate) {
 		System.out.println("From what approach you want to generate Qiskit programs?");
 		boolean cont = true;
@@ -82,6 +87,7 @@ public class Main {
 			}
 		}
 
+	//Options of the second menu (to choose the UML mutatation approach)
 	private static void displayOptionsMut() {
 		System.out.println("1 - Quantum Gate Replacement");
 		System.out.println("2 - Quantum Gate Deletion");
@@ -91,7 +97,7 @@ public class Main {
 		System.out.println("6 - Stop");
 
 	}
-
+	//Options of the first menu (to choose between mutate UML models or generate qiskit programs)
 	private static void options() {
 		System.out.println("Select the option in the following menu");
 		System.out.println("1 - create mutants");

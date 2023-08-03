@@ -6,9 +6,9 @@ from numpy import pi
 q0 = QuantumRegister(1, 'q0')
 
 
-mutation = QuantumCircuit(q0)
+mutantQGI17 = QuantumCircuit(q0)
 
-mutation.h(q0)
-mutation.z(q0)
-mutation.m(q0)
+mutantQGI17.h(q0)
+mutantQGI17.z(q0)
+mutantQGI17.s(q0)
 
