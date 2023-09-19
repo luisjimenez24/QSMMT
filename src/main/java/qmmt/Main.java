@@ -12,7 +12,7 @@ import qmmt.utils.DefaultParser;
 
 public class Main {
 	static DefaultParser dp;
-	static final String routeInputModel = "umlModels\\prueba.uml";
+	static final String routeInputModel = "umlModels\\pruebacx.uml";
 	static final Scanner reader = new Scanner(System.in);
 
 	public static void main(String[] args) {

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.eclipse.epsilon.egl.parse.Egx_EolParserRules.returnStatement_return;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -17,7 +18,6 @@ import qmmt.utils.DefaultParser;
 
 public class ModelMutantGenerator {
     static DefaultParser dp;
-    String route = "umlModels\\prueba.uml";
 
     public static void initializeModelMutantGenerator(String route){
         File f = new File(route);
@@ -37,25 +37,31 @@ public class ModelMutantGenerator {
 
 		// Se itera sobre el número de puertas cuánticas del diagrama
 		for (Node n : qGates) {
-			NamedNodeMap attributes = n.getAttributes();
-			String qgName = attributes.getNamedItem("name").getTextContent();
-			if(qgName.toUpperCase().equals("M")){
-					mutantsQMD.add(createMutantQGD(uml, n));
-				}
-			for (QuantumGatesEnum qgs : QuantumGatesEnum.values()) {
-				if (qgName.toUpperCase().equals(qgs.getQuantumGate())) {
-					mutantsQGR.addAll(createMutantQGR(uml, qgs, n));
-					mutantsQGD.add(createMutantQGD(uml, n));
-					mutantsQGI.addAll(createMutantQGI(uml, qgs, n));
-					mutantsQMI.add(mutantcreateMutantQMI(uml, n));
-				}
+			System.out.println(n.getAttributes().getNamedItem("name").getTextContent());
+			if(hasTwoQubitGates(uml)){
+				//System.out.println("hola");
 			}
 		}
-		saveMutants(mutantsQGR, "umlModels\\mutantsQGR\\mutantQGR");
-		saveMutants(mutantsQGD, "umlModels\\mutantsQGD\\mutantQGD");
-		saveMutants(mutantsQGI, "umlModels\\mutantsQGI\\mutantQGI");
-		saveMutants(mutantsQMI, "umlModels\\mutantsQMI\\mutantQMI");
-		saveMutants(mutantsQMD, "umlModels\\mutantsQMD\\mutantQMD");
+
+		// 	NamedNodeMap attributes = n.getAttributes();
+		// 	String qgName = attributes.getNamedItem("name").getTextContent();
+		// 	if(qgName.toUpperCase().equals("M")){
+		// 			mutantsQMD.add(createMutantQGD(uml, n));
+		// 		}
+		// 	for (QuantumGatesEnum qgs : QuantumGatesEnum.values()) {
+		// 		if (qgName.toUpperCase().equals(qgs.getQuantumGate())) {
+		// 			mutantsQGR.addAll(createMutantQGR(uml, qgs, n));
+		// 			mutantsQGD.add(createMutantQGD(uml, n));
+		// 			mutantsQGI.addAll(createMutantQGI(uml, qgs, n));
+		// 			mutantsQMI.add(mutantcreateMutantQMI(uml, n));
+		// 		}
+		// 	}
+		// }
+		// saveMutants(mutantsQGR, "umlModels\\mutantsQGR\\mutantQGR");
+		// saveMutants(mutantsQGD, "umlModels\\mutantsQGD\\mutantQGD");
+		// saveMutants(mutantsQGI, "umlModels\\mutantsQGI\\mutantQGI");
+		// saveMutants(mutantsQMI, "umlModels\\mutantsQMI\\mutantQMI");
+		// saveMutants(mutantsQMD, "umlModels\\mutantsQMD\\mutantQMD");
 	}
 
 	private static void saveMutants(ArrayList<Document> mutants, String pathToSave){
@@ -426,11 +432,25 @@ public class ModelMutantGenerator {
 
 		for (int i = 0; i < qGatesUml.getLength(); i++) {
 			NamedNodeMap attributes = qGatesUml.item(i).getAttributes();
-			if (attributes.getNamedItem("xmi:type").getTextContent()
-					.equals(UmlEnum.QUANTUM_GATE.getType())) {
-				qGatesNodes.add(qGatesUml.item(i));
+			
+			for (String quantumGateTypes : UmlEnum.QUANTUM_GATE.getTypes()) {
+				if (attributes.getNamedItem("xmi:type").getTextContent().equals(quantumGateTypes)) {
+					qGatesNodes.add(qGatesUml.item(i));
+				}
 			}
+	
 		}
 		return qGatesNodes;
+	}
+
+	private static boolean hasTwoQubitGates(Document umlDocument){
+		String ownedRule = "//ownedRule";
+		NodeList qGatesUml = dp.evaluateExpresion(umlDocument, ownedRule);
+
+		if(qGatesUml.getLength()!=0){
+			return true;
+		}else{
+			return false;
+		}
 	}
 }
