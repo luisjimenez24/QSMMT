@@ -100,9 +100,9 @@ public class Main {
 	//Options of the first menu (to choose between mutate UML models or generate qiskit programs)
 	private static void options() {
 		System.out.println("Select the option in the following menu");
-		System.out.println("1 - create mutants");
-		System.out.println("2 - create qiskit programs");
-		System.out.println("3 - create test suite");
+		System.out.println("1 - Create mutants");
+		System.out.println("2 - Create qiskit programs");
+		System.out.println("3 - Create test suite");
 		System.out.println("4 - Execute test suite");
 	}
 }

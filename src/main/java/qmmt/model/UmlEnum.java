@@ -1,7 +1,7 @@
 package qmmt.model;
 
 public enum UmlEnum {
-	QUANTUM_GATE(new String[] {"uml:CallOperationAction", "uml:AcceptEventAction", "uml:SendSignalAction"}), QUBIT(new String[] {"uml:ActivityPartition"});
+	ONE_QUBIT_QUANTUM_GATE(new String[] {"uml:CallOperationAction"}), QUBIT(new String[] {"uml:ActivityPartition"}), TWO_QUBIT_QUANTUM_GATE(new String [] {"uml:AcceptEventAction", "uml:SendSignalAction"});
 
 	private String [] type;
 
