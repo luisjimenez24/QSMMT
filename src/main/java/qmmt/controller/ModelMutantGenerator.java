@@ -108,6 +108,12 @@ public class ModelMutantGenerator {
 				// Añadimos la ownedRule de los constrainedElement
 				insertNewConstrainedElement(umlMutant, entry, quantumGateFound.getEquivalences()[i]);
 
+				// Insertamos los nuevos ids al Activity
+				insertNewQGToActivity(umlMutant);
+
+				// Insertamos los nuevos ids a los atributos 'node' de los qubits
+				insertNewIdToQubits(umlMutant, entry);
+				
 				mutants.add(umlMutant);
 
 			} catch (ParserConfigurationException e) {
@@ -115,8 +121,37 @@ public class ModelMutantGenerator {
 				e.printStackTrace();
 			}
 		}
-
 		return mutants;
+	}
+
+	//Metodo para meter los nuevos ids a los correspondientes attributos 'node' de los qubits
+	private static void insertNewIdToQubits(Document umlMutant, Entry<Node, Node> entry) {
+		//Conseguimos los nodos para el nombre del constraint
+		Node sendSignalActionNode = getSendSignalActionNode(entry);
+		Node acceptEventActionNode = getAcceptEventActionNode(entry);
+
+		String idQubit1 = sendSignalActionNode.getAttributes().getNamedItem("inPartition").getTextContent();
+		String idQubit2 = acceptEventActionNode.getAttributes().getNamedItem("inPartition").getTextContent();
+		String evExprQubit1 = "//group[@id=\"" + idQubit1 + "\"]";
+		String evExprQubit2 = "//group[@id=\"" + idQubit2 + "\"]";
+		
+		NodeList nodeQubit1 = dp.evaluateExpresion(umlMutant, evExprQubit1);
+		NodeList nodeQubit2 = dp.evaluateExpresion(umlMutant, evExprQubit2);
+
+		//Metemos los ids correspondientes a cada qubit
+		String newNodeAtrQ1 = nodeQubit1.item(0).getAttributes().getNamedItem("node").getTextContent() + " idMutant";
+		String newNodeAtrQ2 = nodeQubit2.item(0).getAttributes().getNamedItem("node").getTextContent() + " idMutant2";
+		nodeQubit1.item(0).getAttributes().getNamedItem("node").setNodeValue(newNodeAtrQ1);
+		nodeQubit2.item(0).getAttributes().getNamedItem("node").setNodeValue(newNodeAtrQ2);
+	}
+
+	//Cambiamos el atributo 'node' del packagedElement introduciendo los nuevos ids
+	private static void insertNewQGToActivity(Document umlMutant) {
+		String evPackagedElementName = "//packagedElement";
+		NodeList packagedNodeList = dp.evaluateExpresion(umlMutant, evPackagedElementName);
+
+		String newNodeAttr = packagedNodeList.item(0).getAttributes().getNamedItem("node").getTextContent() + " idMutant idMutant2";
+		packagedNodeList.item(0).getAttributes().getNamedItem("node").setNodeValue(newNodeAttr);		
 	}
 
 	//Metodo para introducir el ConstrainedElement que implica la introducción de la nueva gate
@@ -160,7 +195,6 @@ public class ModelMutantGenerator {
 		newSpecification.appendChild(newBody);
 		newNodeSSA.appendChild(newSpecification);
 		umlMutant.getElementsByTagName("edge").item(0).getParentNode().appendChild(newNodeSSA);
-
 	}
 
 	//Método para insertar los dos nodos de la nueva puerta cuántica de dos qubits
@@ -191,7 +225,7 @@ public class ModelMutantGenerator {
 		// una nueva puerta cuántica de dos qubits con el QUML Profile 
 		Element qUmlProfilElementSSA = umlMutant.createElement("QuantumUMLProfile:ControlledQubit");
 		qUmlProfilElementSSA.setAttribute("xmi:id", "qUmlProfile");
-		qUmlProfilElementSSA.setAttribute("base_SignalAction", "idMutant");
+		qUmlProfilElementSSA.setAttribute("base_SendSignalAction", "idMutant");
 
 		Element qUmlProfilElementAEA = umlMutant.createElement("QuantumUMLProfile:QuantumGate");
 		qUmlProfilElementAEA.setAttribute("xmi:id", "qUmlProfile");
