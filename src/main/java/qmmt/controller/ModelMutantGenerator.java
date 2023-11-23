@@ -45,7 +45,7 @@ public class ModelMutantGenerator {
 			NamedNodeMap attributes = n.getAttributes();
 			String qgName = attributes.getNamedItem("name").getTextContent();
 			if (qgName.toUpperCase().equals("M")) {
-				// mutantsQMD.add(createMutantQGD(uml, n));
+				mutantsQMD.add(createMutantQGD(uml, n));
 			}
 			for (QuantumGatesEnum qgs : QuantumGatesEnum.values()) {
 				if (qgName.toUpperCase().equals(qgs.getQuantumGate())) {
@@ -68,15 +68,15 @@ public class ModelMutantGenerator {
 					// mutantsQGR.addAll(createMutantTwoQubitsQGR(uml, entry, qgs));
 					// mutantsQGI.addAll(createMutantTwoQubitsMutantQGI(uml, entry, qgs));
 					// mutantsQGD.add(createMutantTwoQubitsQGD(uml, entry));
-					mutantsQMI.add(createMutantTwoQubitQMI(uml, entry));
+					// mutantsQMI.add(createMutantTwoQubitQMI(uml, entry));
 				}
 			}
 		}
 		// saveMutants(mutantsQGR, "umlModels\\mutantsQGR\\mutantQGR");
 		// saveMutants(mutantsQGD, "umlModels\\mutantsQGD\\mutantQGD");
 		// saveMutants(mutantsQGI, "umlModels\\mutantsQGI\\mutantQGI");
-		 saveMutants(mutantsQMI, "umlModels\\mutantsQMI\\mutantQMI");
-		// saveMutants(mutantsQMD, "umlModels\\mutantsQMD\\mutantQMD");
+		// saveMutants(mutantsQMI, "umlModels\\mutantsQMI\\mutantQMI");
+		saveMutants(mutantsQMD, "umlModels\\mutantsQMD\\mutantQMD");
 	}
 
 	// Método para crear el mutante mediante el approach del QMI (inserción de
@@ -141,8 +141,8 @@ public class ModelMutantGenerator {
 		System.out.println(idSendSignalAction);
 		System.out.println(idAcceptEventAction);
 
-		deleteBaseSendSignalAction(umlMutant, idSendSignalAction);
-		deleteBaseAction(umlMutant, idAcceptEventAction);
+		deleteBaseAction(umlMutant, idSendSignalAction, "QuantumUMLProfile:ControlledQubit", "base_SendSignalAction");
+		deleteBaseAction(umlMutant, idAcceptEventAction, "QuantumUMLProfile:QuantumGate", "base_Action");
 
 		// Segundo delete: en el atributo "node" del packagedElement aparece el ID de la
 		// puerta cuántica a borrar
@@ -626,27 +626,68 @@ public class ModelMutantGenerator {
 		Document umlMutant = null;
 		try {
 			umlMutant = dp.createCopy(uml);
+
+			// Conseguimos el id de la puerta con la que estamos trabajando
+			String qgId = qgNode.getAttributes().getNamedItem("xmi:id").getTextContent();
+
+			// Primer delete: el elemento de <QuantumUMLProfile:QuantumGate...
+			deleteBaseAction(umlMutant, qgId, "QuantumUMLProfile:Measure", "base_Action");
+
+			// Segundo delete: en el atributo "node" del packagedElement aparece el ID de la
+			// puerta cuántica a borrar
+			deletePackagedElementNodeAttribute(umlMutant, qgId);
+
+			// Tercer delete: en el atributo "node" del qubit donde se aplica aparece el ID
+			// de la puerta cuántica a borrar
+			deleteQubitNodeAttr(umlMutant, qgId);
+		
+			// Cuarto delete: registro clásico o puerta cuántica
+			String [] outgoingEdges = getOutgoingEdges(umlMutant, qgNode);
+			for (String id : outgoingEdges){
+				String evNodesIncoming = "//node[@incoming=\"" + id + "\"]";
+				NodeList evOutgoingNodes = dp.evaluateExpresion(umlMutant, evNodesIncoming);
+				if(evOutgoingNodes.item(0).getAttributes().getNamedItem("xmi:type").getTextContent().equals("uml:DataStoreNode")){
+					deleteClassicalRegister(umlMutant, evOutgoingNodes.item(0));
+				}else{
+					deleteMeasureNoClassicalReg(umlMutant, qgId, evOutgoingNodes.item(0));
+				}
+			}
+
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 		}
-		// Conseguimos el id de la puerta con la que estamos trabajando
-		String qgId = qgNode.getAttributes().getNamedItem("xmi:id").getTextContent();
 
-		// Conseguimos los nodos del UML que corresponde a la QG previa y la siguiente,
-		// respectivamente
-		NodeList nextQg = getNextQg(umlMutant, qgId);
+		return umlMutant;
+	}
 
-		// Primer delete: el elemento de <QuantumUMLProfile:QuantumGate...
-		deleteBaseAction(umlMutant, qgId);
 
-		// Segundo delete: en el atributo "node" del packagedElement aparece el ID de la
-		// puerta cuántica a borrar
-		deletePackagedElementNodeAttribute(umlMutant, qgId);
+	// Metodo para eliminar el registro clásico asociado a la puerta cuántica
+	// Measure y su edge
+	private static void deleteClassicalRegister(Document umlMutant, Node classicalReg) {
+		String idEdge = classicalReg.getAttributes().getNamedItem("incoming").getTextContent();
+		String idClassicalReg = classicalReg.getAttributes().getNamedItem("xmi:id").getTextContent();
+		classicalReg.getParentNode().removeChild(classicalReg);
 
-		// Tercer delete: en el atributo "node" del qubit donde se aplica aparece el ID
-		// de la puerta cuántica a borrar
-		deleteQubitNodeAttr(umlMutant, qgId);
+		// Se borra también el edge asociado de la puerta M a borrar con el registro
+		// clásico
+		String evEdgeToDelete = "//edge[@id=\"" + idEdge + "\"]";
+		NodeList edgeList = dp.evaluateExpresion(umlMutant, evEdgeToDelete);
+		Node deleteEdge = edgeList.item(0);
+		deleteEdge.getParentNode().removeChild(deleteEdge);
 
+		// Borramos el id del classical register que aparece en el packaged Element
+		deletePackagedElementNodeAttribute(umlMutant, idClassicalReg);
+	}
+
+	// Metodo para conseguir los edges a los que apunta la puerta measure a borrar
+	private static String[] getOutgoingEdges(Document umlMutant, Node qgNode) {
+		String outgoingAttrb = qgNode.getAttributes().getNamedItem("outgoing").getTextContent();
+
+		return outgoingAttrb.split(" ");
+	}
+
+	// Borrar la puerta Measure: la siguiente puerta no es un registro clásico
+	private static void deleteMeasureNoClassicalReg(Document umlMutant, String qgId, Node nextQg) {
 		// Cuarto delete: el nodo de la puerta cuántica
 		deleteQuantumGateNode(umlMutant, qgId);
 
@@ -655,43 +696,25 @@ public class ModelMutantGenerator {
 		deleteNextEdge(umlMutant, qgId);
 
 		// Modificación del previous edge
-		String idNextQg = nextQg.item(0).getAttributes().getNamedItem("xmi:id").getTextContent();
+		String idNextQg = nextQg.getAttributes().getNamedItem("xmi:id").getTextContent();
 		String idModifiedEdge = modifyPreviousEdge(umlMutant, qgId, idNextQg);
 
 		// Modificación del atributo "incoming" de la siguiente puerta
 		modifyNextQuantumGateNode(umlMutant, idNextQg, idModifiedEdge);
 
 		// Modificacion del atributo "edge" del qubit en caso de que no exista
-		modifyEdgeQubitAttr(umlMutant, idModifiedEdge);
-
-		return umlMutant;
+		//modifyEdgeQubitAttr(umlMutant, idModifiedEdge);
 	}
 
 	// Con este método se borra el nodo " <QuantumUMLProfile:QuantumGate>" que hace
 	// referencia a la puerta que se va a borrar
-	public static void deleteBaseAction(Document umlMutant, String qgId) {
+	public static void deleteBaseAction(Document umlMutant, String qgId, String umlProfile, String baseAction) {
 		Element root = umlMutant.getDocumentElement();
 		Node deleteNode = null;
 		for (int i = 0; i < root.getChildNodes().getLength(); i++) {
-			if (root.getChildNodes().item(i).getNodeName().equals("QuantumUMLProfile:QuantumGate")) {
+			if (root.getChildNodes().item(i).getNodeName().equals(umlProfile)) {
 				NamedNodeMap att = root.getChildNodes().item(i).getAttributes();
-				if (att.getNamedItem("base_Action").getTextContent().equals(qgId)) {
-					deleteNode = root.getChildNodes().item(i);
-				}
-			}
-		}
-
-		deleteNode.getParentNode().removeChild(deleteNode);
-	}
-
-	// Con este método se borra el nodo " <QuantumUMLProfile:ControlledQubit>
-	private static void deleteBaseSendSignalAction(Document umlMutant, String idSendSignalAction) {
-		Element root = umlMutant.getDocumentElement();
-		Node deleteNode = null;
-		for (int i = 0; i < root.getChildNodes().getLength(); i++) {
-			if (root.getChildNodes().item(i).getNodeName().equals("QuantumUMLProfile:ControlledQubit")) {
-				NamedNodeMap att = root.getChildNodes().item(i).getAttributes();
-				if (att.getNamedItem("base_SendSignalAction").getTextContent().equals(idSendSignalAction)) {
+				if (att.getNamedItem(baseAction).getTextContent().equals(qgId)) {
 					deleteNode = root.getChildNodes().item(i);
 				}
 			}
