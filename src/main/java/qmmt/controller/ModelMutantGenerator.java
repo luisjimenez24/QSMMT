@@ -9,7 +9,6 @@ import java.util.Map.Entry;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.eclipse.epsilon.egl.parse.Egx_EolParserRules.returnStatement_return;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -53,7 +52,7 @@ public class ModelMutantGenerator {
 					// mutantsQGR.addAll(createMutantQGR(uml, qgs, n));
 					// mutantsQGD.add(createMutantQGD(uml, n));
 					// mutantsQGI.addAll(createMutantQGI(uml, qgs, n));
-					// mutantsQMI.add(mutantcreateMutantQMI(uml, n));
+					// mutantsQMI.add(createMutantQMI(uml, n));
 				}
 			}
 		}
@@ -68,17 +67,58 @@ public class ModelMutantGenerator {
 					// createTwoQubitsMutantQGR(uml, entry, qgs);
 					// mutantsQGR.addAll(createMutantTwoQubitsQGR(uml, entry, qgs));
 					// mutantsQGI.addAll(createMutantTwoQubitsMutantQGI(uml, entry, qgs));
-					mutantsQGD.add(createMutantTwoQubitsQGD(uml, entry));
+					// mutantsQGD.add(createMutantTwoQubitsQGD(uml, entry));
+					mutantsQMI.add(createMutantTwoQubitQMI(uml, entry));
 				}
 			}
 		}
 		// saveMutants(mutantsQGR, "umlModels\\mutantsQGR\\mutantQGR");
-		saveMutants(mutantsQGD, "umlModels\\mutantsQGD\\mutantQGD");
+		// saveMutants(mutantsQGD, "umlModels\\mutantsQGD\\mutantQGD");
 		// saveMutants(mutantsQGI, "umlModels\\mutantsQGI\\mutantQGI");
-		// saveMutants(mutantsQMI, "umlModels\\mutantsQMI\\mutantQMI");
+		 saveMutants(mutantsQMI, "umlModels\\mutantsQMI\\mutantQMI");
 		// saveMutants(mutantsQMD, "umlModels\\mutantsQMD\\mutantQMD");
 	}
 
+	// Método para crear el mutante mediante el approach del QMI (inserción de
+	// puerta M)
+	// Dependiendo del tipo de puerta que sea el SendSignalAction (si es control) la
+	// puerta M se introduciría o no
+	private static Document createMutantTwoQubitQMI(Document uml, Entry<Node, Node> entry) {
+		Document umlMutant = null;
+
+		Node acceptEventActionNode = getAcceptEventActionNode(entry);
+
+		try {
+			umlMutant = dp.createCopy(uml);
+
+			// Cambiamos la siguiente puerta y obtenemos su ID
+			String idNextQg = changeNextQgQGI(umlMutant, acceptEventActionNode);
+
+			// Cambiamos edge previo
+			String idPrevEdge = changePreviousEdgeQGI(umlMutant, acceptEventActionNode);
+
+			// Insertamos el nuevo edge
+			insertNewEdgeQGI(umlMutant, idNextQg, "idMutant");
+
+			// Insertamos la nueva QG
+			insertNewQG(umlMutant, idPrevEdge, "M", "uml:CallOperationAction");
+
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return umlMutant;
+
+	}
+
+	private static boolean ssaIsControlled(Node sendSignalActionNode) {
+		if (sendSignalActionNode.getAttributes().getNamedItem("name").getTextContent().equals("C")) {
+			return true;
+		}
+		return false;
+	}
+
+	// Método para crear el mutante mediante el approach del QGD (borrado de QG)
 	private static Document createMutantTwoQubitsQGD(Document uml, Entry<Node, Node> entry) {
 		Document umlMutant = null;
 		try {
@@ -122,7 +162,7 @@ public class ModelMutantGenerator {
 		// con la siguiente
 		deleteNextEdge(umlMutant, idAcceptEventAction);
 
-		// Sexto delete: la owned rule 
+		// Sexto delete: la owned rule
 		deleteOwnedRule(umlMutant);
 
 		// Modificación del previous edge
@@ -131,15 +171,12 @@ public class ModelMutantGenerator {
 
 		// Modificación del atributo "incoming" de la siguiente puerta
 		modifyNextQuantumGateNode(umlMutant, idNextQg, idModifiedEdge);
-
-	
-
-		//modifyEdgeQubitAttr(umlMutant, idModifiedEdge);
+		// modifyEdgeQubitAttr(umlMutant, idModifiedEdge);
 
 		return umlMutant;
 	}
 
-	//Metodo para realizar el borrado de la ownedRule
+	// Metodo para realizar el borrado de la ownedRule
 	private static void deleteOwnedRule(Document umlMutant) {
 		String evOwnedRule = "//ownedRule";
 		NodeList ownedRuleNodeList = dp.evaluateExpresion(umlMutant, evOwnedRule);
@@ -147,8 +184,9 @@ public class ModelMutantGenerator {
 		ownRule.getParentNode().removeChild(ownRule);
 	}
 
-	//Método para crear los mutantes uml de puertas cuánticas de dos qubits con el approach de QGI
-	private static ArrayList<Document>createMutantTwoQubitsMutantQGI(Document umlComplete, Entry<Node, Node> entry,
+	// Método para crear los mutantes uml de puertas cuánticas de dos qubits con el
+	// approach de QGI
+	private static ArrayList<Document> createMutantTwoQubitsMutantQGI(Document umlComplete, Entry<Node, Node> entry,
 			QuantumGatesEnum quantumGateFound) {
 		ArrayList<Document> mutants = new ArrayList<>();
 
@@ -164,7 +202,7 @@ public class ModelMutantGenerator {
 				String idNextQg = changeNextQgQGI(umlMutant, acceptEventActionNode);
 
 				// Cambiamos edge previo
-				//Node sendSignalActionNode = getSendSignalActionNode(entry);
+				// Node sendSignalActionNode = getSendSignalActionNode(entry);
 				String idPrevEdge = changePreviousEdgeQGI(umlMutant, acceptEventActionNode);
 				System.out.println(idPrevEdge);
 
@@ -182,7 +220,7 @@ public class ModelMutantGenerator {
 
 				// Insertamos los nuevos ids a los atributos 'node' de los qubits
 				insertNewIdToQubits(umlMutant, entry);
-				
+
 				mutants.add(umlMutant);
 
 			} catch (ParserConfigurationException e) {
@@ -193,9 +231,10 @@ public class ModelMutantGenerator {
 		return mutants;
 	}
 
-	//Metodo para meter los nuevos ids a los correspondientes attributos 'node' de los qubits
+	// Metodo para meter los nuevos ids a los correspondientes attributos 'node' de
+	// los qubits
 	private static void insertNewIdToQubits(Document umlMutant, Entry<Node, Node> entry) {
-		//Conseguimos los nodos para el nombre del constraint
+		// Conseguimos los nodos para el nombre del constraint
 		Node sendSignalActionNode = getSendSignalActionNode(entry);
 		Node acceptEventActionNode = getAcceptEventActionNode(entry);
 
@@ -203,29 +242,31 @@ public class ModelMutantGenerator {
 		String idQubit2 = acceptEventActionNode.getAttributes().getNamedItem("inPartition").getTextContent();
 		String evExprQubit1 = "//group[@id=\"" + idQubit1 + "\"]";
 		String evExprQubit2 = "//group[@id=\"" + idQubit2 + "\"]";
-		
+
 		NodeList nodeQubit1 = dp.evaluateExpresion(umlMutant, evExprQubit1);
 		NodeList nodeQubit2 = dp.evaluateExpresion(umlMutant, evExprQubit2);
 
-		//Metemos los ids correspondientes a cada qubit
+		// Metemos los ids correspondientes a cada qubit
 		String newNodeAtrQ1 = nodeQubit1.item(0).getAttributes().getNamedItem("node").getTextContent() + " idMutant";
 		String newNodeAtrQ2 = nodeQubit2.item(0).getAttributes().getNamedItem("node").getTextContent() + " idMutant2";
 		nodeQubit1.item(0).getAttributes().getNamedItem("node").setNodeValue(newNodeAtrQ1);
 		nodeQubit2.item(0).getAttributes().getNamedItem("node").setNodeValue(newNodeAtrQ2);
 	}
 
-	//Cambiamos el atributo 'node' del packagedElement introduciendo los nuevos ids
+	// Cambiamos el atributo 'node' del packagedElement introduciendo los nuevos ids
 	private static void insertNewQGToActivity(Document umlMutant) {
 		String evPackagedElementName = "//packagedElement";
 		NodeList packagedNodeList = dp.evaluateExpresion(umlMutant, evPackagedElementName);
 
-		String newNodeAttr = packagedNodeList.item(0).getAttributes().getNamedItem("node").getTextContent() + " idMutant idMutant2";
-		packagedNodeList.item(0).getAttributes().getNamedItem("node").setNodeValue(newNodeAttr);		
+		String newNodeAttr = packagedNodeList.item(0).getAttributes().getNamedItem("node").getTextContent()
+				+ " idMutant idMutant2";
+		packagedNodeList.item(0).getAttributes().getNamedItem("node").setNodeValue(newNodeAttr);
 	}
 
-	//Metodo para introducir el ConstrainedElement que implica la introducción de la nueva gate
+	// Metodo para introducir el ConstrainedElement que implica la introducción de
+	// la nueva gate
 	private static void insertNewConstrainedElement(Document umlMutant, Entry<Node, Node> entry, String newQg) {
-		//Conseguimos los nodos para el nombre del constraint
+		// Conseguimos los nodos para el nombre del constraint
 		Node sendSignalActionNode = getSendSignalActionNode(entry);
 		Node acceptEventActionNode = getAcceptEventActionNode(entry);
 
@@ -233,7 +274,7 @@ public class ModelMutantGenerator {
 		String idQubit2 = acceptEventActionNode.getAttributes().getNamedItem("inPartition").getTextContent();
 		String evExprQubit1 = "//group[@id=\"" + idQubit1 + "\"]";
 		String evExprQubit2 = "//group[@id=\"" + idQubit2 + "\"]";
-		
+
 		NodeList nodeQubit1 = dp.evaluateExpresion(umlMutant, evExprQubit1);
 		NodeList nodeQubit2 = dp.evaluateExpresion(umlMutant, evExprQubit2);
 
@@ -241,21 +282,22 @@ public class ModelMutantGenerator {
 		Element newNodeSSA = umlMutant.createElement("ownedRule");
 		newNodeSSA.setAttribute("constrainedElement", "idMutant idMutant2");
 		newNodeSSA.setAttribute("xmi:id", "newConstraint");
-		newNodeSSA.setAttribute("name", newQg + "("+nodeQubit1.item(0).getAttributes().getNamedItem("name").getTextContent()+
-		"-"+nodeQubit2.item(0).getAttributes().getNamedItem("name").getTextContent()+")");
+		newNodeSSA.setAttribute("name",
+				newQg + "(" + nodeQubit1.item(0).getAttributes().getNamedItem("name").getTextContent() +
+						"-" + nodeQubit2.item(0).getAttributes().getNamedItem("name").getTextContent() + ")");
 		newNodeSSA.setAttribute("xmi:type", "uml:Constraint");
-		
-		//Creamos el node del specification
+
+		// Creamos el node del specification
 		Element newSpecification = umlMutant.createElement("specification");
 		newSpecification.setAttribute("name", "constrainedSpecMutant");
 		newSpecification.setAttribute("xmi:type", "uml:OpaqueExpression");
 		newSpecification.setAttribute("xmi:id", "newSpec");
 
-		//Creamos el nodo del language
+		// Creamos el nodo del language
 		Element newLanguage = umlMutant.createElement("language");
 		newLanguage.setTextContent("Natural language");
 
-		//Creamos el nodo del language
+		// Creamos el nodo del language
 		Element newBody = umlMutant.createElement("body");
 		newBody.setTextContent(newQg);
 
@@ -266,8 +308,9 @@ public class ModelMutantGenerator {
 		umlMutant.getElementsByTagName("edge").item(0).getParentNode().appendChild(newNodeSSA);
 	}
 
-	//Método para insertar los dos nodos de la nueva puerta cuántica de dos qubits
-	private static void insertNewQG2Qubits(Document umlMutant, String idPrevEdge, String newQg, Entry<Node, Node> entry) {
+	// Método para insertar los dos nodos de la nueva puerta cuántica de dos qubits
+	private static void insertNewQG2Qubits(Document umlMutant, String idPrevEdge, String newQg,
+			Entry<Node, Node> entry) {
 		Node acceptEventActionNode = getAcceptEventActionNode(entry);
 		Node sendSignalActionNode = getSendSignalActionNode(entry);
 		String[] divisionQG = findDivisionQGReplace(newQg);
@@ -280,7 +323,7 @@ public class ModelMutantGenerator {
 		newNodeSSA.setAttribute("xmi:id", "idMutant");
 		newNodeSSA.setAttribute("name", divisionQG[0].toUpperCase());
 		newNodeSSA.setAttribute("xmi:type", "uml:SendSignalAction");
-		
+
 		// Creamos el node del AcceptEventAction
 		Element newNodeAEA = umlMutant.createElement("node");
 		newNodeAEA.setAttribute("inPartition",
@@ -290,8 +333,9 @@ public class ModelMutantGenerator {
 		newNodeAEA.setAttribute("name", divisionQG[1].toUpperCase());
 		newNodeAEA.setAttribute("xmi:type", "uml:AcceptEventAction");
 
-		// Creamos los dos elements <QuantumUMLProfile:QuantumGate> y <QuantumUMLProfile:ControlledQubit> para indicar que se crea
-		// una nueva puerta cuántica de dos qubits con el QUML Profile 
+		// Creamos los dos elements <QuantumUMLProfile:QuantumGate> y
+		// <QuantumUMLProfile:ControlledQubit> para indicar que se crea
+		// una nueva puerta cuántica de dos qubits con el QUML Profile
 		Element qUmlProfilElementSSA = umlMutant.createElement("QuantumUMLProfile:ControlledQubit");
 		qUmlProfilElementSSA.setAttribute("xmi:id", "qUmlProfile");
 		qUmlProfilElementSSA.setAttribute("base_SendSignalAction", "idMutant");
@@ -312,18 +356,19 @@ public class ModelMutantGenerator {
 	}
 
 	private static Node getSendSignalActionNode(Entry<Node, Node> entry) {
-		if(entry.getKey().getAttributes().getNamedItem("xmi:type").getTextContent().equals("uml:SendSignalAction")){
+		if (entry.getKey().getAttributes().getNamedItem("xmi:type").getTextContent().equals("uml:SendSignalAction")) {
 			return entry.getKey();
-		}else{
+		} else {
 			return entry.getValue();
 		}
 	}
 
-	//Metodo para conseguir el node de tipo AcceptEventAction de las puertas cuánticas de dos qubits
+	// Metodo para conseguir el node de tipo AcceptEventAction de las puertas
+	// cuánticas de dos qubits
 	private static Node getAcceptEventActionNode(Entry<Node, Node> entry) {
-		if(entry.getKey().getAttributes().getNamedItem("xmi:type").getTextContent().equals("uml:AcceptEventAction")){
+		if (entry.getKey().getAttributes().getNamedItem("xmi:type").getTextContent().equals("uml:AcceptEventAction")) {
 			return entry.getKey();
-		}else{
+		} else {
 			return entry.getValue();
 		}
 	}
@@ -360,7 +405,8 @@ public class ModelMutantGenerator {
 		return mutants;
 	}
 
-	//Método para cambiar el nombre de las puertas cuánticas de dos qubits usando el approach del QGR
+	// Método para cambiar el nombre de las puertas cuánticas de dos qubits usando
+	// el approach del QGR
 	private static void changeNodesNameToReplace(ArrayList<Node> nodesToChange, String qGateReplace) {
 		String[] divisionQG = findDivisionQGReplace(qGateReplace);
 		for (Node n : nodesToChange) {
@@ -375,7 +421,7 @@ public class ModelMutantGenerator {
 		}
 	}
 
-	//Método para encontrar la division de la puerta cuántica
+	// Método para encontrar la division de la puerta cuántica
 	private static String[] findDivisionQGReplace(String qGateReplace) {
 		String[] qgDivision = null;
 		for (QuantumGatesEnum qgs : QuantumGatesEnum.values()) {
@@ -438,7 +484,7 @@ public class ModelMutantGenerator {
 		packagedElement.getAttributes().getNamedItem("name").setNodeValue(newName);
 	}
 
-	private static Document mutantcreateMutantQMI(Document uml, Node umlNode) {
+	private static Document createMutantQMI(Document uml, Node umlNode) {
 		Document umlMutant = null;
 		try {
 			umlMutant = dp.createCopy(uml);
@@ -637,6 +683,7 @@ public class ModelMutantGenerator {
 
 		deleteNode.getParentNode().removeChild(deleteNode);
 	}
+
 	// Con este método se borra el nodo " <QuantumUMLProfile:ControlledQubit>
 	private static void deleteBaseSendSignalAction(Document umlMutant, String idSendSignalAction) {
 		Element root = umlMutant.getDocumentElement();
@@ -652,6 +699,7 @@ public class ModelMutantGenerator {
 
 		deleteNode.getParentNode().removeChild(deleteNode);
 	}
+
 	// Se bora el id de la puerta cuantica a borrar del atributo "node" del
 	// "<packagedElement>"
 	private static void deletePackagedElementNodeAttribute(Document umlMutant, String qgId) {
