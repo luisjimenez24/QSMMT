@@ -49,10 +49,10 @@ public class ModelMutantGenerator {
 			}
 			for (QuantumGatesEnum qgs : QuantumGatesEnum.values()) {
 				if (qgName.toUpperCase().equals(qgs.getQuantumGate())) {
-					// mutantsQGR.addAll(createMutantQGR(uml, qgs, n));
-					// mutantsQGD.add(createMutantQGD(uml, n));
-					// mutantsQGI.addAll(createMutantQGI(uml, qgs, n));
-					// mutantsQMI.add(createMutantQMI(uml, n));
+					mutantsQGR.addAll(createMutantQGR(uml, qgs, n));
+					mutantsQGD.add(createMutantQGD(uml, n));
+					mutantsQGI.addAll(createMutantQGI(uml, qgs, n));
+					mutantsQMI.add(createMutantQMI(uml, n));
 				}
 			}
 		}
@@ -64,18 +64,17 @@ public class ModelMutantGenerator {
 						+ entry.getValue().getAttributes().getNamedItem("name").getTextContent())
 						.equals(qgs.getQuantumGate())) {
 
-					// createTwoQubitsMutantQGR(uml, entry, qgs);
-					// mutantsQGR.addAll(createMutantTwoQubitsQGR(uml, entry, qgs));
-					// mutantsQGI.addAll(createMutantTwoQubitsMutantQGI(uml, entry, qgs));
-					// mutantsQGD.add(createMutantTwoQubitsQGD(uml, entry));
-					// mutantsQMI.add(createMutantTwoQubitQMI(uml, entry));
+					mutantsQGR.addAll(createMutantTwoQubitsQGR(uml, entry, qgs));
+					mutantsQGI.addAll(createMutantTwoQubitsMutantQGI(uml, entry, qgs));
+					mutantsQGD.add(createMutantTwoQubitsQGD(uml, entry));
+					mutantsQMI.add(createMutantTwoQubitQMI(uml, entry));
 				}
 			}
 		}
-		// saveMutants(mutantsQGR, "umlModels\\mutantsQGR\\mutantQGR");
-		// saveMutants(mutantsQGD, "umlModels\\mutantsQGD\\mutantQGD");
-		// saveMutants(mutantsQGI, "umlModels\\mutantsQGI\\mutantQGI");
-		// saveMutants(mutantsQMI, "umlModels\\mutantsQMI\\mutantQMI");
+		saveMutants(mutantsQGR, "umlModels\\mutantsQGR\\mutantQGR");
+		saveMutants(mutantsQGD, "umlModels\\mutantsQGD\\mutantQGD");
+		saveMutants(mutantsQGI, "umlModels\\mutantsQGI\\mutantQGI");
+		saveMutants(mutantsQMI, "umlModels\\mutantsQMI\\mutantQMI");
 		saveMutants(mutantsQMD, "umlModels\\mutantsQMD\\mutantQMD");
 	}
 
@@ -631,7 +630,11 @@ public class ModelMutantGenerator {
 			String qgId = qgNode.getAttributes().getNamedItem("xmi:id").getTextContent();
 
 			// Primer delete: el elemento de <QuantumUMLProfile:QuantumGate...
-			deleteBaseAction(umlMutant, qgId, "QuantumUMLProfile:Measure", "base_Action");
+			if(qgNode.getAttributes().getNamedItem("name").getTextContent().equals("M")){
+				deleteBaseAction(umlMutant, qgId, "QuantumUMLProfile:Measure", "base_Action");
+			}else{
+				deleteBaseAction(umlMutant, qgId, "QuantumUMLProfile:QuantumGate", "base_Action");
+			}
 
 			// Segundo delete: en el atributo "node" del packagedElement aparece el ID de la
 			// puerta cuántica a borrar

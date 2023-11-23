@@ -3,15 +3,15 @@
     <packageImport xmi:id="_0-tQ4LdZEe2gVf62LoCHyw" xmi:type="uml:PackageImport">
       <importedPackage href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#_0" xmi:type="uml:Model"/>
     </packageImport>
-    <packagedElement group="_6RDUQLdZEe2gVf62LoCHyw _6RDUQbdZEe2gVf62LoCHyw" name="mutantQGI8" node="__TMYcLdZEe2gVf62LoCHyw _DYKCsLdaEe2gVf62LoCHyw _DUzXQrdbEe2gVf62LoCHyw _DU7TELdbEe2gVf62LoCHyw _V7SxQLdbEe2gVf62LoCHyw _YAHvwLdbEe2gVf62LoCHyw _azyxQLdbEe2gVf62LoCHyw _az4Q0LdbEe2gVf62LoCHyw _k8YK0LdbEe2gVf62LoCHyw" xmi:id="_08qCcLdZEe2gVf62LoCHyw" xmi:type="uml:Activity">
-      <ownedRule constrainedElement="_DU7TELdbEe2gVf62LoCHyw _DUzXQrdbEe2gVf62LoCHyw" name="CX(q0-q1)" xmi:id="_DUzXQLdbEe2gVf62LoCHyw" xmi:type="uml:Constraint">
+    <packagedElement group="_6RDUQLdZEe2gVf62LoCHyw _6RDUQbdZEe2gVf62LoCHyw" name="mutantQGR11" node="__TMYcLdZEe2gVf62LoCHyw _DYKCsLdaEe2gVf62LoCHyw _DUzXQrdbEe2gVf62LoCHyw _DU7TELdbEe2gVf62LoCHyw _V7SxQLdbEe2gVf62LoCHyw _YAHvwLdbEe2gVf62LoCHyw _azyxQLdbEe2gVf62LoCHyw _az4Q0LdbEe2gVf62LoCHyw _k8YK0LdbEe2gVf62LoCHyw" xmi:id="_08qCcLdZEe2gVf62LoCHyw" xmi:type="uml:Activity">
+      <ownedRule constrainedElement="_DU7TELdbEe2gVf62LoCHyw _DUzXQrdbEe2gVf62LoCHyw" name="CH(q0-q1)" xmi:id="_DUzXQLdbEe2gVf62LoCHyw" xmi:type="uml:Constraint">
         <specification name="constraintSpec" xmi:id="_DUzXQbdbEe2gVf62LoCHyw" xmi:type="uml:OpaqueExpression">
           <language>Natural language</language>
           <body>CX</body>
         </specification>
       </ownedRule>
       <edge source="__TMYcLdZEe2gVf62LoCHyw" target="_DYKCsLdaEe2gVf62LoCHyw" xmi:id="_SyTAALdbEe2gVf62LoCHyw" xmi:type="uml:ControlFlow"/>
-      <edge inPartition="_6RDUQbdZEe2gVf62LoCHyw" source="_DYKCsLdaEe2gVf62LoCHyw" target="idMutant" xmi:id="_TYdBELdbEe2gVf62LoCHyw" xmi:type="uml:ControlFlow"/>
+      <edge inPartition="_6RDUQbdZEe2gVf62LoCHyw" source="_DYKCsLdaEe2gVf62LoCHyw" target="_DU7TELdbEe2gVf62LoCHyw" xmi:id="_TYdBELdbEe2gVf62LoCHyw" xmi:type="uml:ControlFlow"/>
       <edge source="_V7SxQLdbEe2gVf62LoCHyw" target="_az4Q0LdbEe2gVf62LoCHyw" xmi:id="_fCdKELdbEe2gVf62LoCHyw" xmi:type="uml:ControlFlow"/>
       <edge source="_YAHvwLdbEe2gVf62LoCHyw" target="_azyxQLdbEe2gVf62LoCHyw" xmi:id="_fkHFoLdbEe2gVf62LoCHyw" xmi:type="uml:ControlFlow"/>
       <edge source="_DUzXQrdbEe2gVf62LoCHyw" target="_V7SxQLdbEe2gVf62LoCHyw" xmi:id="_gc_OYLdbEe2gVf62LoCHyw" xmi:type="uml:ControlFlow"/>
@@ -21,8 +21,8 @@
       <group edge="_TYdBELdbEe2gVf62LoCHyw" name="q0" node="_DYKCsLdaEe2gVf62LoCHyw _DU7TELdbEe2gVf62LoCHyw _V7SxQLdbEe2gVf62LoCHyw" xmi:id="_6RDUQbdZEe2gVf62LoCHyw" xmi:type="uml:ActivityPartition"/>
       <node name="" outgoing="_SyTAALdbEe2gVf62LoCHyw" xmi:id="__TMYcLdZEe2gVf62LoCHyw" xmi:type="uml:InitialNode"/>
       <node inPartition="_6RDUQbdZEe2gVf62LoCHyw" incoming="_SyTAALdbEe2gVf62LoCHyw" name="H" outgoing="_TYdBELdbEe2gVf62LoCHyw" xmi:id="_DYKCsLdaEe2gVf62LoCHyw" xmi:type="uml:CallOperationAction"/>
-      <node inPartition="_6RDUQLdZEe2gVf62LoCHyw" name="X" outgoing="_gc_OYLdbEe2gVf62LoCHyw" xmi:id="_DUzXQrdbEe2gVf62LoCHyw" xmi:type="uml:AcceptEventAction"/>
-      <node inPartition="_6RDUQbdZEe2gVf62LoCHyw" incoming="edgeMutant" name="C" xmi:id="_DU7TELdbEe2gVf62LoCHyw" xmi:type="uml:SendSignalAction"/>
+      <node inPartition="_6RDUQLdZEe2gVf62LoCHyw" name="h" outgoing="_gc_OYLdbEe2gVf62LoCHyw" xmi:id="_DUzXQrdbEe2gVf62LoCHyw" xmi:type="uml:AcceptEventAction"/>
+      <node inPartition="_6RDUQbdZEe2gVf62LoCHyw" incoming="_TYdBELdbEe2gVf62LoCHyw" name="c" xmi:id="_DU7TELdbEe2gVf62LoCHyw" xmi:type="uml:SendSignalAction"/>
       <node inPartition="_6RDUQbdZEe2gVf62LoCHyw" incoming="_gc_OYLdbEe2gVf62LoCHyw" name="M" outgoing="_fCdKELdbEe2gVf62LoCHyw _g-QvcLdbEe2gVf62LoCHyw" xmi:id="_V7SxQLdbEe2gVf62LoCHyw" xmi:type="uml:CallOperationAction"/>
       <node inPartition="_6RDUQLdZEe2gVf62LoCHyw" incoming="_g-QvcLdbEe2gVf62LoCHyw" name="M" outgoing="_fkHFoLdbEe2gVf62LoCHyw _meIRcLdbEe2gVf62LoCHyw" xmi:id="_YAHvwLdbEe2gVf62LoCHyw" xmi:type="uml:CallOperationAction"/>
       <node incoming="_fkHFoLdbEe2gVf62LoCHyw" isControlType="true" name="register2" xmi:id="_azyxQLdbEe2gVf62LoCHyw" xmi:type="uml:DataStoreNode">
@@ -32,7 +32,7 @@
         <upperBound value="1" xmi:id="_az4Q0bdbEe2gVf62LoCHyw" xmi:type="uml:LiteralInteger"/>
       </node>
       <node incoming="_meIRcLdbEe2gVf62LoCHyw" xmi:id="_k8YK0LdbEe2gVf62LoCHyw" xmi:type="uml:ActivityFinalNode"/>
-    <edge source="idMutant" target="_DU7TELdbEe2gVf62LoCHyw" xmi:id="edgeMutant" xmi:type="uml:ControlFlow"/><node inPartition="_6RDUQbdZEe2gVf62LoCHyw" incoming="_TYdBELdbEe2gVf62LoCHyw" name="y" outgoing="edgeMutant" xmi:id="idMutant" xmi:type="uml:CallOperationAction"/></packagedElement>
+    </packagedElement>
     <profileApplication xmi:id="_09kBYLdZEe2gVf62LoCHyw" xmi:type="uml:ProfileApplication">
       <eAnnotations source="PapyrusVersion" xmi:id="_ceLoQMc6Ee2zlr0bEl8blw" xmi:type="ecore:EAnnotation">
         <details key="Version" value="0.1.6" xmi:id="_ceLoQcc6Ee2zlr0bEl8blw" xmi:type="ecore:EStringToStringMapEntry"/>
@@ -74,4 +74,4 @@
   <QuantumUMLProfile:ControlledQubit base_SendSignalAction="_DU7TELdbEe2gVf62LoCHyw" xmi:id="_DZGBc7dbEe2gVf62LoCHyw"/>
   <QuantumUMLProfile:Measure base_Action="_V7SxQLdbEe2gVf62LoCHyw" xmi:id="_V7XpxrdbEe2gVf62LoCHyw"/>
   <QuantumUMLProfile:Measure base_Action="_YAHvwLdbEe2gVf62LoCHyw" xmi:id="_YAOddrdbEe2gVf62LoCHyw"/>
-<QuantumUMLProfile:QuantumGate base_Action="idMutant" xmi:id="qUmlProfile"/></xmi:XMI>
+</xmi:XMI>
