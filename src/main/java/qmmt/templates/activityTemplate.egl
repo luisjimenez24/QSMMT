@@ -2,6 +2,8 @@
 
 [*IMPORTS*]
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
+from qiskit import BasicAer
+from qiskit import execute
 from numpy import pi
 
 [%var circuitName = anActivity.name.replace(' ', '_').replace('-', '_');
@@ -43,6 +45,13 @@ from numpy import pi
 				type = actual.toString().split(' ').get(0).split('@').get(0);
 			}
 		}%]
+		
+[*EXECUTING THE JOB*]
+# running the job
+backend = BasicAer.get_backend("qasm_simulator")
+job = execute([%=circuitName%], backend=backend, coupling_map=None, shots=1024)
+result = job.result()
+print(result.get_counts([%=circuitName%]))
 
 [*FUNCTIONS*]
 [%function checkGateType(node) : String{

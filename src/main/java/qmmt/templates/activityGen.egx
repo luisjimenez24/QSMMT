@@ -2,9 +2,9 @@ rule Activity2PythonFile transform anActivity : Activity {
 		parameters : Map {"gates" = Sequence{"NOT", "I"},
 					   	  "gatesQiskit" = Sequence{"x", "id"}}
 		template : "../templates/activityTemplate.egl"
-		target : "../temp/RESULTS/quantumCircuits/" + anActivity.name.replace(' ', '_').replace('-', '_') + ".py"
+		target : "../../../../../output/Qiskit/" + anActivity.name.replace(' ', '_').replace('-', '_') + ".py"
 }
 rule PackageInit transform aPackage : Activity {
 		template : "../templates/packageTemplate.egl"
-		target : "../temp/RESULTS/quantumCircuits/__init__.py"
+		target : "../../../../../output/Qiskit/__init__.py"
 }
